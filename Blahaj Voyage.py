@@ -13,6 +13,8 @@
 from random import randint
 from math import floor
 import json
+import sys
+import time
 
 
 
@@ -21,7 +23,11 @@ def display(file):
 	with open(file) as f:
 		lines = f.readlines()
 	for line in lines:
-		print(line[:-1])
+		for c in line[:-1]:
+			sys.stdout.write(c)
+			sys.stdout.flush()
+			time.sleep(0.0002)
+		print()
 
 
 # Welcome and storyline info
