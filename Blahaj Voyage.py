@@ -71,70 +71,112 @@ def chapter_1():
 	print("--------")
 	print("After activating their CHARISMA, Blahaj reaches out to the other sharks.\nWith their power, "+str(souls)+" of the sharks wake up and join Blahaj.")
 	print("The ground under the crate suddenly jolts, sending Blahaj and his new friends sprawling. The lorry has begun to move...")
+	return souls
 
 
-def chapter_2():
-	display("ch2.txt")
-	
+# A single monster fight in chapter 2
+def fight(chosen, souls):
+	hp = 100
+	str = 30
 	
 	# Reading JSON
 	with open("products.json") as file:
 		data = json.load(file)
+	
+	# Choosing monster
+	rand_id = randint(0,len(data["products"])-1)
+	while rand_id in chosen:
+		rand_id = randint(0,len(data["products"])-1)
+	chosen.append(rand_id)
+	for p in data["products"]:
+		if p["id"] == rand_id:
+			enemy = p
+			break
+			
+	# Display info about the fight
+	ename = enemy["name"]
+	ehp = enemy["hp"]
+	estr = enemy["str"]
+	
+	ename_f = ""
+	for c in ename:
+		ename_f += c.upper()+" "
+	print("--------------")
+	print(f"[Fight {len(chosen)}/3]\nB L A H A J    VS    {ename_f}\n")
+	print(f"{ename} <> {ehp} HP <> {estr} STR")
+	print(f"Blahaj <> {hp} HP <> {str} STR <> {souls} Companions")
+	
+	# Fighting...
+	while hp > 0 and ehp > 0:
+		print()
+		print("------------")
+		atk = randint(int(str/2),str)
+		eatk = randint(int(round(enemy["str"])/2),enemy["str"])
+		hp -= eatk
+		ehp -= atk
+		
+		#attack messages
+		print(f"Blahaj dealt {atk} damage!")
+		print(f"{ename} dealt {eatk} damage!")
+		print()
+		
+		#stats
+		print(f"Blahaj - {hp} HP")
+		print(f"{ename} - {ehp} HP")
+		
+		#check if dead
+		if hp <= 0 and ehp <= 0:
+			print("Both fighters have died, the fight will start again.")
+			chosen.pop()
+			chosen, souls = fight(chosen,souls)
+		elif hp <= 0:
+			print("Blahaj is dead...")
+			if souls > 0:
+				print("Their soul escapes their body and enters the body of one of their companions.")
+				souls -= 1
+				chosen.pop()
+				chosen, souls = fight(chosen,souls)
+			else:
+				input("Blahaj has no more companions :(\n\nG A M E    O V E R\n\nPress Enter to Quit ")
+				quit()
+		elif ehp <= 0:
+			print(f"{ename} is dead!")
+		
+		print()
+		input("Press enter to continue ")
+		
+	return chosen, souls
+	
 
+# Fighting flat-packed furniture on a truck
+def chapter_2(souls):
+	display("ch2.txt")
 	
 	# Fight 3 Monsters
 	chosen = []
-	str = 40
-	for i in range(1):
-		hp = 100
+	for i in range(3):
+		chosen,souls = fight(chosen,souls)
 		
-		# Choosing monster
-		rand_id = randint(0,len(data["products"])-1)
-		while rand_id in chosen:
-			rand_id = randint(0,len(data["products"])-1)
-		chosen.append(rand_id)
-		for p in data["products"]:
-			if p["id"] == rand_id:
-				enemy = p
-				break
+	print("------------")
+	print("Blahaj ascends towards the prime location at the top of the box pile, clambering over the bodies of those\nthat they have defeated.")
+	print("\nSEVERAL HOURS LATER...\n")
+	print("The truck suddenly comes to a stop. Sunlight spills in through the doors as they open, a relief after spending\nseveral hours sitting in the dark.")
+	print("\n\n\n")
+	
+	return souls
+		
 
-		#TODO: message saying "You are now fighting enemy-name"
-		# Fighting monster
-		ehp = enemy["hp"]
-		ename = enemy["name"]
-		while hp > 0 and ehp > 0:
-			print()
-			print("------------")
-			atk = randint(int(str/2),str)
-			eatk = randint(int(round(enemy["str"])/2),enemy["str"])
-			hp -= eatk
-			ehp -= atk
-			
-			#attack messages
-			print(f"Blahaj dealt {atk} damage!")
-			print(f"{ename} dealt {eatk} damage!")
-			print()
-			
-			#stats
-			print(f"Blahaj - {hp} HP")
-			print(f"{ename} - {ehp} HP")
-			if hp <= 0:
-				print("Blahaj is dead!")
-				#TODO: take a soul and restart the fight, or die and restart/quit
-			if ehp <= 0:
-				print(f"{ename} is dead!")
-			if hp <= 0 and ehp <= 0:
-				print("Both fighters have died, the fight will start again.")
-				hp = 100
-				ehp = enemy["hp"]
-			print()
-			
-			input("Press enter to continue ")
+# Reaching Ryan's house
+def chapter_3(souls):
+	display("ch3.txt")
+	print(f"Final Number of Companions: {souls}\n\n")
+	
 	
 
 def main():
-	#chapter_0()
-	#chapter_1()
-	chapter_2()
+	chapter_0()
+	souls = chapter_1()
+	souls = chapter_2(souls)
+	chapter_3(souls)
 
 main()
